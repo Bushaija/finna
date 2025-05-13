@@ -9,6 +9,12 @@ import { z } from 'zod'
 import { useOnboardingStore } from '@/store/onboarding-store'
 import { redirect } from 'next/navigation'
 
+// Define the District type
+interface District {
+    id: string | number;
+    district: string;
+}
+
 // Validation Schema
 const formSchema = z.object({
     name: z.string()
@@ -59,29 +65,25 @@ export default function OnBoarding() {
         const getUserInfo = async () => {
             try {
                 // In a real app, you would fetch this from an API endpoint that reads the httpOnly cookie
-                // For demo purposes, we'll just check if we have a session
-                const response = await fetch('/api/user', { 
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                // For demo purposes, we'll just check for user data in local storage
+                const savedUserEmail = localStorage.getItem('userEmail');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    setUserInfo(data);
+                if (savedUserEmail) {
+                    const userData = { email: savedUserEmail };
+                    setUserInfo(userData);
                     
                     // Pre-fill the form with user info if available and not already filled
-                    if (data.name && !name) {
-                        setOnboardingData({ name: data.name });
+                    if (userData.email && !email) {
+                        setOnboardingData({ email: userData.email });
                     }
-                    
-                    if (data.email && !email) {
-                        setOnboardingData({ email: data.email });
-                    }
+                } else {
+                    // No user data found, redirect to sign-in
+                    router.push('/sign-in');
                 }
             } catch (error) {
                 console.error('Error fetching user info:', error);
+                // On error, also redirect to sign-in
+                router.push('/sign-in');
             }
         };
         
@@ -167,7 +169,19 @@ export default function OnBoarding() {
     }
 
     // Extract the subcomponents here
-    const PersonalInfoFields = ({ formData, handleInputChange, errors }) => (
+    interface PersonalInfoFieldsProps {
+        formData: {
+            name: string;
+            email: string;
+            province: string;
+            district: string;
+            hospital: string;
+        };
+        handleInputChange: (field: keyof z.infer<typeof formSchema>, value: string) => void;
+        errors: FormErrors;
+    }
+
+    const PersonalInfoFields = ({ formData, handleInputChange, errors }: PersonalInfoFieldsProps) => (
         <div>
             <label className="block text-sm font-medium mb-1">Personal Information</label>
             <div className="space-y-2">
@@ -196,6 +210,16 @@ export default function OnBoarding() {
     );
 
     // Location fields component
+    interface LocationFieldsProps {
+        selectedProvince: string;
+        setSelectedProvince: (province: string) => void;
+        selectedDistrict: string;
+        setSelectedDistrict: (district: string) => void;
+        filteredDistricts: District[];
+        handleInputChange: (field: keyof z.infer<typeof formSchema>, value: string) => void;
+        errors: FormErrors;
+    }
+
     const LocationFields = ({ 
         selectedProvince, 
         setSelectedProvince, 
@@ -204,7 +228,7 @@ export default function OnBoarding() {
         filteredDistricts, 
         handleInputChange, 
         errors 
-    }) => {
+    }: LocationFieldsProps) => {
         // Get unique provinces
         const provinces = [...new Set(districtsProvincesData.map(item => item.province))].sort();
         
@@ -241,7 +265,7 @@ export default function OnBoarding() {
                             className={`w-full px-3 py-2 border rounded-md ${errors.district ? 'border-red-500' : 'border-gray-300'}`}
                         >
                             <option value="">Select District</option>
-                            {filteredDistricts.map((district) => (
+                            {filteredDistricts.map((district: District) => (
                                 <option key={district.id} value={district.district}>
                                     {district.district}
                                 </option>
@@ -255,7 +279,20 @@ export default function OnBoarding() {
     };
 
     // Hospital selection component
-    const HospitalField = ({ hospitals, handleInputChange, formData, errors }) => (
+    interface HospitalFieldProps {
+        hospitals: string[];
+        handleInputChange: (field: keyof z.infer<typeof formSchema>, value: string) => void;
+        formData: {
+            name: string;
+            email: string;
+            province: string;
+            district: string;
+            hospital: string;
+        };
+        errors: FormErrors;
+    }
+
+    const HospitalField = ({ hospitals, handleInputChange, formData, errors }: HospitalFieldProps) => (
         <div>
             <label className="block text-sm font-medium mb-1">Hospital</label>
             <select
@@ -264,7 +301,7 @@ export default function OnBoarding() {
                 className={`w-full px-3 py-2 border rounded-md ${errors.hospital ? 'border-red-500' : 'border-gray-300'}`}
             >
                 <option value="">Select Hospital</option>
-                {hospitals.map((hospital) => (
+                {hospitals.map((hospital: string) => (
                     <option key={hospital} value={hospital}>
                         {hospital}
                     </option>

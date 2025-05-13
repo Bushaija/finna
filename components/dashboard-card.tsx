@@ -65,7 +65,7 @@ export function DashboardCard({ healthFacilityType, healthFacilityName, district
   return (
     <Card className="w-[350px]">
       <CardHeader className="flex flex-row gap-2 p-4">
-        <div className="bg-black rounded-md flex justify-center items-center w-[40px] h-[40px] text-md text-white font-bold">
+        <div className={`bg-black rounded-md flex justify-center items-center w-[40px] h-[40px] text-md font-bold ${healthFacilityType === "Hospital" ? "text-yellow-500" : "text-green-500"}`}>
           {healthFacilityType === "Hospital" ? "H" : "HC"}
         </div>
         <div className="flex flex-col">

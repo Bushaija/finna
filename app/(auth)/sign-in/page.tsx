@@ -1,14 +1,49 @@
+'use client'
+
 import { LogoIcon } from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, FormEvent } from 'react'
 
 export default function SignInPage() {
+    const router = useRouter()
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [error, setError] = useState('')
+    
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setIsSubmitting(true)
+        setError('')
+        
+        try {
+            // In a real app, you would validate credentials with an API
+            // For now, we're just simulating a successful login
+            
+            // Mock successful authentication
+            console.log('Login attempt with:', { email, password })
+            
+            // Store email in localStorage for the dashboard page to use
+            localStorage.setItem('userEmail', email)
+            
+            // Navigate to dashboard
+            router.push('/')
+        } catch (error) {
+            console.error('Login error:', error)
+            setError('Invalid email or password')
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+    
     return (
         <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
             <form
-                // action={}
+                onSubmit={handleSubmit}
                 className="bg-card m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
                 <div className="p-8 pb-6">
                     <div>
@@ -72,6 +107,12 @@ export default function SignInPage() {
 
                     <hr className="my-4 border-dashed" />
 
+                    {error && (
+                        <div className="mb-4 rounded bg-red-50 p-2 text-sm text-red-500">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="space-y-5">
                         <div className="space-y-2">
                             <Label
@@ -84,6 +125,8 @@ export default function SignInPage() {
                                 required
                                 name="email"
                                 id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
 
@@ -99,6 +142,8 @@ export default function SignInPage() {
                                 name="pwd"
                                 id="pwd"
                                 className="input sz-md variant-mixed"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             <div className="text-right text-sm">
                                 <Button
@@ -110,7 +155,12 @@ export default function SignInPage() {
                             </div>
                         </div>
 
-                        <Button className="w-full">Sign In</Button>
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isSubmitting}>
+                            {isSubmitting ? 'Signing In...' : 'Sign In'}
+                        </Button>
                     </div>
                 </div>
 

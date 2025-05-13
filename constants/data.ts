@@ -37,6 +37,45 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [] // No child items
   },
+  {
+    title: 'Reports',
+    url: '/reports',
+    icon: 'page',
+    shortcut: ['r', 'r'],
+    isActive: true,
+    items: [
+      {
+        title: 'Revenue & Expenditure',
+        url: '#/reports/revenue-expenditure',
+        icon: 'post',
+        shortcut: ['r', 'e']
+      },
+      {
+        title: 'Assets & Liabilities',
+        url: '#/reports/assets-liabilities',
+        icon: 'media',
+        shortcut: ['a', 'l']
+      },
+      {
+        title: 'Cash Flows',
+        url: '#/reports/cash-flows',
+        icon: 'dashboard',
+        shortcut: ['c', 'f']
+      },
+      {
+        title: 'Changes in Net Assets',
+        url: '#/reports/net-assets',
+        icon: 'page',
+        shortcut: ['n', 'a']
+      },
+      {
+        title: 'Budget vs Actual',
+        url: '#/reports/budget-actual',
+        icon: 'kanban',
+        shortcut: ['b', 'a']
+      },
+    ]
+  },
 //   {
 //     title: 'Implementations',
 //     url: '/implementations', // Placeholder as there is no direct link for the parent
