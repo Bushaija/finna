@@ -191,11 +191,11 @@ export default function PlanningPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => router.push(`/planning/view/${plan.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/planning/view/${plan.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(`/planning/edit/${plan.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/planning/edit/${plan.id}`)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>

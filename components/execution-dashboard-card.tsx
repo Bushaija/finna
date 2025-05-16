@@ -80,7 +80,7 @@ export function ExecutionDashboardCard({
       setSelectedFiscalYear(selectedFiscalYear);
       setSelectedQuarter(selectedQuarter);
       setFacility(healthFacilityName, healthFacilityType, district);
-      router.push('/execution/new');
+      router.push('/dashboard/execution/new');
     }
   };
   

@@ -102,7 +102,7 @@ export default function ViewPlan() {
           </Button>
           <h1 className="text-2xl font-bold">View Plan</h1>
         </div>
-        <Button onClick={() => router.push(`/planning/edit/${plan.id}`)}>
+        <Button onClick={() => router.push(`/dashboard/planning/edit/${plan.id}`)}>
           <Edit className="mr-2 h-4 w-4" /> Edit Plan
         </Button>
       </div>

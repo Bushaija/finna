@@ -557,7 +557,7 @@ const ExecutionReportDetails = () => {
           
           <Button 
             size="sm" 
-            onClick={() => router.push(`/execution/edit/${reportId}`)}
+            onClick={() => router.push(`/dashboard/execution/edit/${reportId}`)}
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit Report

@@ -59,7 +59,7 @@ export function DashboardCard({ healthFacilityType, healthFacilityName, district
       setSelectedProgram(selectedProgram);
       setSelectedFiscalYear(selectedFiscalYear);
       setFacility(healthFacilityName, healthFacilityType, district);
-      router.push('/planning/new');
+      router.push('/dashboard/planning/new');
     }
   };
   

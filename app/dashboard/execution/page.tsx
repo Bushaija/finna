@@ -27,7 +27,7 @@ export default function ExecutionPage() {
           <h1 className="text-2xl font-bold">Execution Reports</h1>
           <p className="text-muted-foreground">Manage financial execution reports</p>
         </div>
-        <Button onClick={() => router.push('/execution/new')}>
+        <Button onClick={() => router.push('/dashboard/execution/new')}>
           <Plus className="mr-2" />
           New Report
         </Button>

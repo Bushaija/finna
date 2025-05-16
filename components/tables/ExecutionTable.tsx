@@ -251,11 +251,11 @@ export default function ExecutionTable({ data, onDelete }: ExecutionTableProps) 
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => router.push(`/execution/details/${report.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/execution/details/${report.id}`)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View details
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(`/execution/edit/${report.id}`)}>
+              <DropdownMenuItem onClick={() => router.push(`/dashboard/execution/edit/${report.id}`)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>

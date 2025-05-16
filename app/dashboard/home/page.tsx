@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useOnboardingStore } from '@/store/onboarding-store';
 import { useRouter } from 'next/navigation';
 import { DashboardCard } from '@/components/dashboard-card';
@@ -78,7 +78,7 @@ const MainPage = () => {
       { value: `Q4 FY ${currentYear + 1}`, label: `Q4 FY ${currentYear + 1}` },
     ];
   }, []);
-  const [reportingPeriod, setReportingPeriod] = useState(reportingPeriodOptions[0]?.value || "");
+  const [reportingPeriod, setReportingPeriod] = useState(() => reportingPeriodOptions[0]?.value || "");
 
   
   // Pagination state
@@ -96,9 +96,14 @@ const MainPage = () => {
     email
   } = useOnboardingStore();
  
-  // Function to find facility data based on hospital name
-  const getFacilityData = () => {
-    if (!hospital) return;
+  // Function to find facility data based on hospital name - memoized with useCallback
+  const getFacilityData = useCallback(() => {
+    if (!hospital) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("Hospital name is missing from onboarding store");
+      }
+      return;
+    }
 
     // Convert both to lowercase and trim for comparison to handle case sensitivity and whitespace
     const normalizedHospital = hospital.toLowerCase().trim();
@@ -129,7 +134,12 @@ const MainPage = () => {
     
     setFacilityPrograms(programsForHospital);
     setHealthCenters(uniqueHealthCenters);
-  };
+    
+    // Add error handling for no matching programs
+    if (process.env.NODE_ENV === "development" && programsForHospital.length === 0) {
+      console.warn("No programs found for hospital:", hospital);
+    }
+  }, [hospital]);
 
   useEffect(() => {
     // Add a small delay to ensure store is hydrated
@@ -143,7 +153,7 @@ const MainPage = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [isCompleted, router, hospital]);
+  }, [isCompleted, router, getFacilityData]);
 
   // Show loading state while checking onboarding status
   if (isLoading) {
@@ -183,67 +193,22 @@ const MainPage = () => {
     }, 500); // 500ms delay to show skeleton loading state
   };
 
-  // Debug information
-  console.log('Onboarding State:', {
-    isCompleted,
-    completedAt,
-    province,
-    district,
-    hospital,
-    name,
-    email
-  });
+  // Debug information only in development
+  if (process.env.NODE_ENV === "development") {
+    console.log('Onboarding State:', {
+      isCompleted,
+      completedAt,
+      province,
+      district,
+      hospital,
+      name,
+      email
+    });
+  }
 
   return (
-    <div className="p-4">
-      {/* <Card className="p-6 max-w-2xl mx-auto mb-8">
-        <h1 className="text-2xl font-bold mb-6">Welcome to Your Dashboard</h1>
-        
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Name</p>
-              <p className="font-medium">{name || 'N/A'}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Email</p>
-              <p className="font-medium">{email || 'N/A'}</p>
-            </div>
-
-            <div>
-              <p className="text-sm text-gray-500">Onboarding Completed</p>
-              <p className="font-medium">
-                {completedAt ? new Date(completedAt).toLocaleString() : 'N/A'}
-              </p>
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-500">Province</p>
-              <p className="font-medium capitalize">{province || 'N/A'}</p>
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-500">District</p>
-              <p className="font-medium capitalize">{district || 'N/A'}</p>
-            </div>
-            
-            <div>
-              <p className="text-sm text-gray-500">Hospital</p>
-              <p className="font-medium capitalize">{hospital || 'N/A'}</p>
-            </div>
-          </div>
-          
-          <div className="mt-8 pt-4 border-t border-gray-200">
-            <button 
-              onClick={handleResetOnboarding}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-            >
-              Reset Onboarding (Dev Only)
-            </button>
-          </div>
-        </div>
-      </Card> */}
+    <main className="p-4">
+      
       <div className="flex flex-col gap-8">
         <DashboardCard 
           healthFacilityType={"Hospital"}
@@ -253,121 +218,105 @@ const MainPage = () => {
           reportingPeriodOptions={reportingPeriodOptions}
         />
       
-        {healthCenters.length > 0 && (
-          <>
-            <div id="health-centers-section" className="flex flex-col gap-6">
-              <h2 className="text-xl font-semibold">Associated Health Centers</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {isChangingPage ? (
-                  // Show skeleton cards while changing page
-                  Array.from({ length: pageSize }).map((_, index) => (
-                    <HealthCenterCardSkeleton key={index} />
-                  ))
-                ) : (
-                  // Show actual health center cards
-                  paginatedHealthCenters.map((center, index) => (
-                    <DashboardCard 
-                      key={`${currentPage}-${index}`}
-                      reportingPeriod={reportingPeriod}
-                      healthFacilityType={"Health Center"}
-                      healthFacilityName={center}
-                      district={district}
-                      programs={facilityPrograms}
-                      reportingPeriodOptions={reportingPeriodOptions}
-                    />
-                  ))
-                )}
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="mt-4">
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          aria-disabled={currentPage === 1}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: totalPages }).map((_, index) => {
-                        const page = index + 1;
-                        // Show first page, last page, and pages around the current page
-                        if (
-                          page === 1 || 
-                          page === totalPages || 
-                          (page >= currentPage - 1 && page <= currentPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={page}>
-                              <PaginationLink 
-                                isActive={currentPage === page}
-                                onClick={() => handlePageChange(page)}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        }
-                        
-                        // Show ellipsis for skipped pages
-                        if (
-                          (page === 2 && currentPage > 3) || 
-                          (page === totalPages - 1 && currentPage < totalPages - 2)
-                        ) {
-                          return (
-                            <PaginationItem key={`ellipsis-${page}`}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          );
-                        }
-                        
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                          aria-disabled={currentPage === totalPages}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
+        {healthCenters.length > 0 ? (
+          <section id="health-centers-section" className="flex flex-col gap-6">
+            <h2 className="text-xl font-semibold">Associated Health Centers</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {isChangingPage ? (
+                // Show skeleton cards while changing page
+                Array.from({ length: pageSize }).map((_, index) => (
+                  <HealthCenterCardSkeleton key={index} />
+                ))
+              ) : (
+                // Show actual health center cards
+                paginatedHealthCenters.map((center) => (
+                  <DashboardCard 
+                    key={`center-${center}`}
+                    reportingPeriod={reportingPeriod}
+                    healthFacilityType={"Health Center"}
+                    healthFacilityName={center}
+                    district={district}
+                    programs={facilityPrograms}
+                    reportingPeriodOptions={reportingPeriodOptions}
+                  />
+                ))
               )}
             </div>
-          </>
+            
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        aria-disabled={currentPage === 1}
+                        aria-label="Previous page"
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }).map((_, index) => {
+                      const page = index + 1;
+                      // Show first page, last page, and pages around the current page
+                      if (
+                        page === 1 || 
+                        page === totalPages || 
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink 
+                              isActive={currentPage === page}
+                              aria-current={currentPage === page ? "page" : undefined}
+                              onClick={() => handlePageChange(page)}
+                              className="cursor-pointer"
+                              aria-label={`Page ${page}`}
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+                      
+                      // Show ellipsis for skipped pages
+                      if (
+                        (page === 2 && currentPage > 3) || 
+                        (page === totalPages - 1 && currentPage < totalPages - 2)
+                      ) {
+                        return (
+                          <PaginationItem key={`ellipsis-${page}`}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+                      
+                      return null;
+                    })}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        aria-disabled={currentPage === totalPages}
+                        aria-label="Next page"
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </section>
+        ) : (
+          <section className="mt-6">
+            <Card className="p-6 text-center text-gray-600">
+              <p>No health centers are currently linked to <strong>{hospital}</strong>. Please check back later or contact support.</p>
+            </Card>
+          </section>
         )}
       </div>
-
-      {/* {hospital && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <DashboardCard 
-            healthFacilityType={"Hospital"}
-            healthFacilityName={hospital}
-            district={district}
-            programs={facilityPrograms}
-          />
-          
-          {healthCenters.length > 0 && (
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Associated Health Centers</h2>
-              <ul className="space-y-2 max-h-[400px] overflow-y-auto">
-                {healthCenters.map((center, index) => (
-                  <li key={index} className="capitalize text-sm px-3 py-2 bg-gray-50 rounded-md">
-                    {center}
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-        </div>
-      )} */}
-    </div>
+    </main>
   );
 };
 
