@@ -236,7 +236,7 @@ export default function PlanningPage() {
               View and manage your facility planning records
             </CardDescription>
           </CardHeader>
-          <Button onClick={() => router.push('/planning/new')} className="mr-[26px]">
+          <Button onClick={() => router.push('/dashboard/planning/new')} className="mr-[26px]">
             <Plus className="mr-2 h-4 w-4" /> Create New Plan
           </Button>
         </div>

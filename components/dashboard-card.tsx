@@ -45,9 +45,10 @@ interface HealthFacilityProps {
   district: string
   programs: Program[]
   reportingPeriodOptions: ReportingPeriod[]
+  reportingPeriod?: string
 }
 
-export function DashboardCard({ healthFacilityType, healthFacilityName, district, programs, reportingPeriodOptions }: HealthFacilityProps) {
+export function DashboardCard({ healthFacilityType, healthFacilityName, district, programs, reportingPeriodOptions, reportingPeriod }: HealthFacilityProps) {
   const router = useRouter();
   const { setSelectedProgram, setSelectedFiscalYear, setFacility } = usePlanningMetadataStore();
   const [selectedProgram, setLocalSelectedProgram] = React.useState<string>("");
