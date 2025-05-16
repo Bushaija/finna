@@ -91,7 +91,7 @@ export default function OnBoarding() {
         
         // If onboarding is already completed, redirect to dashboard
         if (isCompleted) {
-            router.push('/dashboard');
+            router.push('/dashboard/home');
         }
     }, [name, email, setOnboardingData, isCompleted, router]);
 
@@ -149,7 +149,7 @@ export default function OnBoarding() {
             completeOnboarding()
             
             // Navigate to dashboard
-            router.push('/dashboard')
+            router.push('/dashboard/home')
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: FormErrors = {}
@@ -352,4 +352,4 @@ export default function OnBoarding() {
             </div>
         </section>
     )
-} 
+};

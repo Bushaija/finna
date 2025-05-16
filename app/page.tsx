@@ -276,8 +276,8 @@ export default function OnBoarding() {
             completeOnboarding()
             
             // Force navigation to dashboard
-            // window.location.href = '/dashboard'
-            router.push('/dashboard')
+            // window.location.href = '/home'
+            router.push('/dashboard/home')
         } catch (error) {
             if (error instanceof z.ZodError) {
                 const fieldErrors: FormErrors = {}

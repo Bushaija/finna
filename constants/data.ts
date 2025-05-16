@@ -14,8 +14,8 @@ export type Product = {
 //Info: The following data is used for the sidebar navigation and Cmd K bar.
 export const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
-    url: '/dashboard',
+    title: 'Home',
+    url: '/dashboard/home',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
@@ -23,7 +23,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Planning',
-    url: '/planning',
+    url: '/dashboard/planning',
     icon: 'product',
     shortcut: ['p', 'p'],
     isActive: false,
@@ -31,7 +31,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Execution',
-    url: '/execution',
+    url: '/dashboard/execution',
     icon: 'billing',
     shortcut: ['e', 'e'],
     isActive: false,
@@ -39,38 +39,38 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Reports',
-    url: '/reports',
+    url: '/dashboard/reports',
     icon: 'page',
     shortcut: ['r', 'r'],
     isActive: true,
     items: [
       {
         title: 'Revenue & Expenditure',
-        url: '/reports/revenue-expenditures',
+        url: '/dashboard/reports/revenue-expenditures',
         icon: 'post',
         shortcut: ['r', 'e']
       },
       {
         title: 'Balance Sheet',
-        url: '/reports/balance-sheet',
+        url: '/dashboard/reports/balance-sheet',
         icon: 'media',
         shortcut: ['a', 'l']
       },
       {
         title: 'Cash Flow',
-        url: '/reports/cash-flow',
+        url: '/dashboard/reports/cash-flow',
         icon: 'dashboard',
         shortcut: ['c', 'f']
       },
       {
         title: 'Changes in Net Assets',
-        url: '/reports/changes-assets',
+        url: '/dashboard/reports/changes-assets',
         icon: 'page',
         shortcut: ['n', 'a']
       },
       {
         title: 'Budget vs Actual',
-        url: '/reports/budget-actual',
+        url: '/dashboard/reports/budget-actual',
         icon: 'kanban',
         shortcut: ['b', 'a']
       },
