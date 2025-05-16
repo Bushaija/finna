@@ -46,31 +46,31 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: 'Revenue & Expenditure',
-        url: '#/reports/revenue-expenditure',
+        url: '/reports/revenue-expenditures',
         icon: 'post',
         shortcut: ['r', 'e']
       },
       {
-        title: 'Assets & Liabilities',
-        url: '#/reports/assets-liabilities',
+        title: 'Balance Sheet',
+        url: '/reports/balance-sheet',
         icon: 'media',
         shortcut: ['a', 'l']
       },
       {
-        title: 'Cash Flows',
-        url: '#/reports/cash-flows',
+        title: 'Cash Flow',
+        url: '/reports/cash-flow',
         icon: 'dashboard',
         shortcut: ['c', 'f']
       },
       {
         title: 'Changes in Net Assets',
-        url: '#/reports/net-assets',
+        url: '/reports/changes-assets',
         icon: 'page',
         shortcut: ['n', 'a']
       },
       {
         title: 'Budget vs Actual',
-        url: '#/reports/budget-actual',
+        url: '/reports/budget-actual',
         icon: 'kanban',
         shortcut: ['b', 'a']
       },

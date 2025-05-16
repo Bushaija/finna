@@ -32,7 +32,7 @@ export const Logo = ({ className }: { className?: string }) => {
             </defs>
         </svg>
     )
-}
+};
 
 export const LogoIcon = ({ className }: { className?: string }) => {
     return (
