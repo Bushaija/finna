@@ -21,7 +21,7 @@ export function PlanGeneralTotalRow({ activities }: PlanGeneralTotalRowProps) {
   
   return (
     <TableRow className="bg-primary/10 font-bold">
-      <TableCell colSpan={8} className="text-right">
+      <TableCell colSpan={8} className="text-right sticky left-0 z-10 bg-primary/10">
         General Total
       </TableCell>
       <TableCell>

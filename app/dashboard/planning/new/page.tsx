@@ -1,39 +1,67 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from "next/navigation"
 import { PlanTable } from '@/features/planning/components/hiv/PlanTable';
-import { CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { usePlanningMetadataStore } from '@/store/planning-metadata';
 import { useOnboardingStore } from '@/store/onboarding-store';
+import { Plan } from '@/features/planning/schema/hiv/schemas';
 
 export default function HIVNewPlan() {
   const searchParams = useSearchParams();
   const { selectedProgram, selectedFiscalYear, facilityName, facilityDistrict, facilityType } = usePlanningMetadataStore();
-  const { 
-    province, 
-  } = useOnboardingStore();
-  const facility = searchParams.get('facility');
-  const isHospital = facility !== 'health-centers';
+  const { province, email } = useOnboardingStore();
+  
+  // Get values from query params, fallback to store values
+  const queryFacilityType = searchParams.get('facilityType');
+  const isHospital = queryFacilityType === 'hospital';
+  
+  // Prepare metadata for the plan
+  const planMetadata = {
+    facilityName: facilityName || searchParams.get('facilityName') || '',
+    facilityType: facilityType || queryFacilityType || '',
+    district: facilityDistrict || searchParams.get('district') || '',
+    province: province || '',
+    period: selectedFiscalYear || searchParams.get('fiscalYear') || '',
+    program: selectedProgram || searchParams.get('program') || 'HIV Program',
+    submittedBy: email || 'Not specified',
+    status: 'draft' as 'draft' | 'pending' | 'approved' | 'rejected'
+  };
+  
+  // Track when plan data has been saved
+  const [planSaved, setPlanSaved] = useState(false);
+
+  // Handler for when the plan is successfully submitted
+  const handlePlanSubmitSuccess = (plan: Plan) => {
+    // Here you could save the complete data to your backend if needed
+    console.log('Plan saved successfully:', plan);
+    setPlanSaved(true);
+  };
+
+  if (!queryFacilityType && !facilityType) {
+    return (
+      <div className="p-6">
+        <p className="text-red-500">Facility not specified. Please provide a facility parameter.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <section>
-        <CardHeader>
-          <div className="flex flex-col gap-2 mb-4">
-            <p>{facilityType}: {facilityName}</p>
-            <p>{"District: "}{" "}{facilityDistrict}{","}{" "}{province}</p>
-            <p>Period: {selectedFiscalYear}</p>
-            <p>Program: {selectedProgram}{" "}{"Program"}</p>
-          </div>
-          <CardDescription>
-            Plan activities and allocate budgets across quarters.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="overflow-auto mb-4">
-          <PlanTable isHospital={isHospital} />
-        </CardContent>
-      </section>
+    <div>
+      {planSaved && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+          <p className="text-green-700">
+            Your plan has been saved successfully. You can continue editing or return to the planning dashboard.
+          </p>
+        </div>
+      )}
+      
+      <PlanTable 
+        isHospital={isHospital} 
+        isEdit={false}
+        onSubmitSuccess={handlePlanSubmitSuccess}
+        metadata={planMetadata}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useOnboardingStore } from '@/store/onboarding-store';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { DashboardCard } from '@/components/dashboard-card';
 import facilitiesData from '@/constants/facilities-data.json';
 import {
@@ -65,10 +65,14 @@ const HealthCenterCardSkeleton = () => {
 
 const MainPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [facilityPrograms, setFacilityPrograms] = useState<Program[]>([]);
   const [healthCenters, setHealthCenters] = useState<string[]>([]);
 
+  // Get facilityType from URL query parameter
+  const facilityType = searchParams.get('facilityType');
+  
   const reportingPeriodOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
     return [
@@ -78,13 +82,34 @@ const MainPage = () => {
       { value: `Q4 FY ${currentYear + 1}`, label: `Q4 FY ${currentYear + 1}` },
     ];
   }, []);
+  
+  // State for reporting period
   const [reportingPeriod, setReportingPeriod] = useState(() => reportingPeriodOptions[0]?.value || "");
-
+  
+  // Update reporting period from URL if available
+  useEffect(() => {
+    const urlReportingPeriod = searchParams.get('reportingPeriod');
+    if (urlReportingPeriod) {
+      setReportingPeriod(urlReportingPeriod);
+    }
+  }, [searchParams]);
   
   // Pagination state
   const pageSize = 4; // Number of health centers per page
   const [currentPage, setCurrentPage] = useState(1);
   const [isChangingPage, setIsChangingPage] = useState(false);
+  
+  // Function to preserve existing query parameters when adding a new one
+  const updateUrlWithFacilityType = useCallback((type: string) => {
+    // Create a URLSearchParams object from the current URL
+    const params = new URLSearchParams(window.location.search);
+    // Set the facilityType parameter
+    params.set('facilityType', type);
+    // Also include the current reporting period
+    params.set('reportingPeriod', reportingPeriod);
+    // Update the URL with the new search parameters
+    router.push(`?${params.toString()}`);
+  }, [router, reportingPeriod]);
   
   const { 
     isCompleted, 
@@ -204,6 +229,9 @@ const MainPage = () => {
       name,
       email
     });
+    
+    // Log the current facilityType from URL
+    console.log('Current facilityType from URL:', facilityType);
   }
 
   return (
@@ -216,6 +244,10 @@ const MainPage = () => {
           district={district}
           programs={facilityPrograms}
           reportingPeriodOptions={reportingPeriodOptions}
+          reportingPeriod={reportingPeriod}
+          onClick={() => {
+            updateUrlWithFacilityType('hospital');
+          }}
         />
       
         {healthCenters.length > 0 ? (
@@ -239,6 +271,9 @@ const MainPage = () => {
                     district={district}
                     programs={facilityPrograms}
                     reportingPeriodOptions={reportingPeriodOptions}
+                    onClick={() => {
+                      updateUrlWithFacilityType('health-center');
+                    }}
                   />
                 ))
               )}

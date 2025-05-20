@@ -49,7 +49,7 @@ export function PlanActivityRow({ activity, index, form, isSubCategory }: PlanAc
   
   return (
     <TableRow className={isSubCategory ? "bg-muted/20" : "bg-muted/50 font-semibold"}>
-      <TableCell className="w-[160px]">
+      <TableCell className="w-[160px] sticky left-0 z-10" style={{ backgroundColor: isSubCategory ? 'rgba(240, 240, 243, 0.2)' : 'rgba(240, 240, 243, 0.5)' }}>
         {!isSubCategory && activity.activityCategory}
       </TableCell>
       <TableCell className="w-[200px]">
